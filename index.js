@@ -13,5 +13,5 @@ const port = process.env.port;
 
 app.listen(port , () => {
   dbconnect();
-  console.log("server is running on port " + process.env.port );
+  console.log("server is running on port " + port);
 });
