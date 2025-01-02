@@ -1,3 +1,4 @@
+const e = require("express");
 const emailValidationCheck = require("../helpers/validateEmail");
 const userModel = require("../Model/userModel");
 const user = require("../Model/userModel");
@@ -32,12 +33,23 @@ async function LoginController(req, res) {
   const { email, password } = req.body;
   try {
     const exituser = await userModel.findOne({ email });
+
     if (exituser) {
-      bcrypt.compare(password, exituser.password).then(function (result) {
+      bcrypt.compare(password, exituser.password).then(async function (result) {
         if (result) {
-          let token = jwt.sign({ foo: "bar" }, process.env.prv_key, {
-            expiresIn: "1h",
-          });
+          const tokeninfo = await userModel
+            .findOne({ email })
+            .select("-password");
+          let token;
+          if (exituser.role === "user") {
+            token = jwt.sign({ tokeninfo }, process.env.prv_key, {
+              expiresIn: "1d",
+            });
+          } else if (exituser.role === "admin") {
+            token = jwt.sign({ tokeninfo }, process.env.prv_key, {
+              expiresIn: "1h",
+            });
+          }
           res
             .status(200)
             .send({ message: "login successfully", user: exituser, token });
