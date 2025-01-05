@@ -48,31 +48,42 @@ async function LoginController(req, res) {
     if (exituser) {
       bcrypt.compare(password, exituser.password).then(async function (result) {
         if (result) {
-          const tokeninfo = await userModel
-            .findOne({ email })
-            .select("-password");
+          const tokeninfo = {
+            id: exituser._id,
+            name: exituser.name,
+            email: exituser.email,
+            role: exituser.role,
+          };
           let token;
           if (exituser.role === "user") {
             token = jwt.sign({ tokeninfo }, process.env.prv_key, {
               expiresIn: "1d",
             });
+            res.cookie("token", token, {
+              httponly: true,
+              secure: false,
+            });
           } else if (exituser.role === "admin") {
             token = jwt.sign({ tokeninfo }, process.env.prv_key, {
               expiresIn: "1h",
             });
+            res.cookie("token", token, {
+              httponly: true,
+              secure: false,
+            });
           }
-          res
+          return res
             .status(200)
-            .send({ message: "login successfully", user: exituser, token });
+            .send({ message: "login successfully", user: tokeninfo, token });
         } else {
-         return res.status(400).send({ error: "invalid credentials" });
+          return res.status(400).send({ error: "invalid credentials" });
         }
       });
     } else {
-    return res.status(400).send({ error: "invalid credentials" });
+      return res.status(400).send({ error: "invalid credentials" });
     }
   } catch (error) {
-   return res.status(400).send({ message: error });
+    return res.status(400).send({ message: error });
   }
 }
 
