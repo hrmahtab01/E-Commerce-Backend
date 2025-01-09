@@ -6,20 +6,24 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      trim:true
+      trim: true,
     },
     email: {
       type: String,
       required: true,
       unique: true,
-      trim:true
+      trim: true,
     },
     password: {
       type: String,
       required: true,
     },
-    otp: {
+    otp: {  
       type: Number,
+    },
+    isveryfied: {
+      type: Boolean,
+      default: false,
     },
     phone: {
       type: String,
@@ -29,13 +33,12 @@ const userSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      
     },
-    role:{
-      type:String,
-      enum:["user", "admin"],
-      default:"user"
-    }
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
   },
   {
     timestamps: true,
@@ -43,3 +46,4 @@ const userSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("user", userSchema);
+   

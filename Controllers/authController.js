@@ -2,10 +2,13 @@ const e = require("express");
 const emailValidationCheck = require("../helpers/validateEmail");
 const userModel = require("../Model/userModel");
 const bcrypt = require("bcrypt");
+const Sendemail = require("../helpers/SendEmalil");
 jwt = require("jsonwebtoken");
 
 async function registetionController(req, res) {
   const { name, email, password } = req.body;
+  Sendemail(email);
+
   if (!name || !email || !password) {
     return res.status(400).send({ error: "All fields are required" });
   }
