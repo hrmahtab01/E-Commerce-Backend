@@ -4,10 +4,11 @@ const userModel = require("../Model/userModel");
 const bcrypt = require("bcrypt");
 const Sendemail = require("../helpers/SendEmalil");
 jwt = require("jsonwebtoken");
+const otp = require("../helpers/Otpgenerator");
 
 async function registetionController(req, res) {
   const { name, email, password } = req.body;
-  Sendemail(email);
+  
 
   if (!name || !email || !password) {
     return res.status(400).send({ error: "All fields are required" });
@@ -36,6 +37,12 @@ async function registetionController(req, res) {
     try {
       let user = new userModel({ name, email, password: hash });
       await user.save();
+      Sendemail(email);
+      const setotp = await userModel.findOneAndUpdate({ email }, { otp: otp } , {new:true});
+      setTimeout(async () => {
+      const setotp = await userModel.findOneAndUpdate({ email }, { otp: null } , {new:true});
+        
+      },5000);
       res.status(201).send({ message: "user registered successfully", user });
     } catch (error) {
       return res.status(404).send(error);
