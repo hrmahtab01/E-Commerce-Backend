@@ -12,18 +12,34 @@ const storage = multer.diskStorage({
     const uniquefilename = Date.now() + "-" + Math.round(Math.random() * 1e9);
     console.log();
     const extention = file.originalname.split(".");
-    const extentondata = extention[1];
 
-    cb(null, file.fieldname + "-" + `${uniquefilename}.${extentondata}`);
+    cb(
+      null,
+      file.fieldname +
+        "-" +
+        `${uniquefilename}.${extention[extention.length - 1]}`
+    );
   },
 });
 
-const upload = multer({ storage: storage });
-const path = require("path");
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+});
+function errorCheck(error, req, res, next) {
+  if (error) {
+    return res.status(500).send({ success: false, message: error.message });
+  }
+  
+  next();
+}
 
 router.post(
   "/createcategory",
   upload.single("image"),
+  errorCheck,
   CreatecategoryController
 );
 
