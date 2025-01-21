@@ -8,7 +8,6 @@ const otp = require("../helpers/Otpgenerator");
 
 async function registetionController(req, res) {
   const { name, email, password } = req.body;
-  
 
   if (!name || !email || !password) {
     return res.status(400).send({ error: "All fields are required" });
@@ -37,15 +36,22 @@ async function registetionController(req, res) {
     try {
       let user = new userModel({ name, email, password: hash });
       await user.save();
-      Sendemail(email);
-      const setotp = await userModel.findOneAndUpdate({ email }, { otp: otp } , {new:true});
+      Sendemail(email );
+      const setotp = await userModel.findOneAndUpdate(
+        { email },
+        { otp: otp },
+        { new: true }
+      );
       setTimeout(async () => {
-      const setotp = await userModel.findOneAndUpdate({ email }, { otp: null } , {new:true});
-        
-      },5000);
+        const setotp = await userModel.findOneAndUpdate(
+          { email },
+          { otp: null },
+          { new: true }
+        );
+      }, 120000);
       res.status(201).send({ message: "user registered successfully", user });
     } catch (error) {
-      return res.status(404).send(error);
+      return res.status(400).send({ message: message.error });
     }
   });
 }
@@ -86,15 +92,54 @@ async function LoginController(req, res) {
             .status(200)
             .send({ message: "login successfully", user: tokeninfo, token });
         } else {
-          return res.status(400).send({ error: "invalid credentials" });
+          return res.status(401).send({ error: "invalid credentials" });
         }
       });
     } else {
-      return res.status(400).send({ error: "invalid credentials" });
+      return res.status(401).send({ error: "invalid credentials" });
     }
   } catch (error) {
     return res.status(400).send({ message: error });
   }
 }
+async function otpVerifyController(req, res) {
+  const { email, otp } = req.body;
+  const existinguser = await userModel.findOne({ email });
+  if (existinguser) {
+    if (existinguser.otp == otp) {
+      existinguser.isveryfied = true;
+      await existinguser.save();
+      return res.status(200).send({ message: "otp verify successfully" });
+    } else {
+      return res.status(401).send({ message: "Invalid otp" });
+    }
+  } else {
+    return res.status(404).send({ message: "user not found" });
+  }
+}
 
-module.exports = { registetionController, LoginController };
+async function resendOtpController(req, res) {
+  const { email } = req.body;
+  const exitinguser = await userModel.findOne({ email });
+  if (exitinguser) {
+    exitinguser.otp = otp;
+    await exitinguser.save();
+    Sendemail(email );
+    setTimeout(async() => {
+      exitinguser.otp = null;
+      await exitinguser.save()
+    }, 120000);
+    res
+      .status(200)
+      .send({ success: true, message: "re-send otp successfully" });
+  } else {
+    return res.status(404).send({ success: false, message: "user not found" });
+  }
+}
+
+module.exports = {
+  registetionController,
+  LoginController,
+  otpVerifyController,
+  resendOtpController,
+};
