@@ -14,15 +14,7 @@ async function registetionController(req, res) {
     if (!name || !email || !password) {
       return res.status(400).send({ error: "All fields are required" });
     }
-    if (!name) {
-      return res.status(400).send({ error: "name is required" });
-    }
-    if (!email) {
-      return res.status(400).send({ error: "email is required" });
-    }
-    if (!password) {
-      return res.status(400).send({ error: "password is required" });
-    }
+
     if (!emailValidationCheck(email)) {
       return res.status(400).send({ error: "Invalid email" });
     }
@@ -39,7 +31,7 @@ async function registetionController(req, res) {
       let user = new userModel({ name, email, password: hash });
       await user.save();
       Sendemail(email);
-      await userModel.findOneAndUpdate({ email }, { otp: otp }, { new: true });
+      await userModel.findOneAndUpdate({ email }, { otp: otpvalue }, { new: true });
       setTimeout(async () => {
         await userModel.findOneAndUpdate(
           { email },
@@ -143,3 +135,4 @@ module.exports = {
   otpVerifyController,
   resendOtpController,
 };
+

@@ -10,14 +10,14 @@ const productSchema = mongoose.Schema({
     type: String,
   },
   image: {
-    type: [],
+    type: Array,
     required: true,
   },
   sellingprice: {
     type: Number,
     required: true,
   },
-  discoundprice: {
+  discoutdprice: {
     type: Number,
   },
   category: {
@@ -38,7 +38,10 @@ const productSchema = mongoose.Schema({
   ],
   quantity: {
     type: Number,
+    default:0,
   },
+},{
+    Timestamps:true
 });
 
 const productModel = mongoose.model("Product", productSchema);
