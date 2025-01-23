@@ -5,57 +5,56 @@ const bcrypt = require("bcrypt");
 const Sendemail = require("../helpers/SendEmalil");
 jwt = require("jsonwebtoken");
 const otp = require("../helpers/Otpgenerator");
+const { verify } = require("jsonwebtoken");
 
+// Signup
 async function registetionController(req, res) {
   const { name, email, password } = req.body;
-
-  if (!name || !email || !password) {
-    return res.status(400).send({ error: "All fields are required" });
-  }
-  if (!name) {
-    return res.status(400).send({ error: "name is required" });
-  }
-  if (!email) {
-    return res.status(400).send({ error: "email is required" });
-  }
-  if (!password) {
-    return res.status(400).send({ error: "password is required" });
-  }
-  if (!emailValidationCheck(email)) {
-    return res.status(400).send({ error: "Invalid email" });
-  }
-
-  const userExist = await userModel.findOne({ email });
-  if (userExist) {
-    return res.status(404).send({ error: "User already exist" });
-  }
-  bcrypt.hash(password, 10, async function (err, hash) {
-    if (err) {
-      return res.status(400).send({ error: err });
+  try {
+    if (!name || !email || !password) {
+      return res.status(400).send({ error: "All fields are required" });
     }
-    try {
+    if (!name) {
+      return res.status(400).send({ error: "name is required" });
+    }
+    if (!email) {
+      return res.status(400).send({ error: "email is required" });
+    }
+    if (!password) {
+      return res.status(400).send({ error: "password is required" });
+    }
+    if (!emailValidationCheck(email)) {
+      return res.status(400).send({ error: "Invalid email" });
+    }
+
+    const userExist = await userModel.findOne({ email });
+    if (userExist) {
+      return res.status(409).send({ error: "User already exist" });
+    }
+    bcrypt.hash(password, 10, async function (err, hash) {
+      if (err) {
+        return res.status(400).send({ error: err });
+      }
+
       let user = new userModel({ name, email, password: hash });
       await user.save();
-      Sendemail(email );
-      const setotp = await userModel.findOneAndUpdate(
-        { email },
-        { otp: otp },
-        { new: true }
-      );
+      Sendemail(email);
+      await userModel.findOneAndUpdate({ email }, { otp: otp }, { new: true });
       setTimeout(async () => {
-        const setotp = await userModel.findOneAndUpdate(
+        await userModel.findOneAndUpdate(
           { email },
           { otp: null },
           { new: true }
         );
       }, 120000);
       res.status(201).send({ message: "user registered successfully", user });
-    } catch (error) {
-      return res.status(400).send({ message: message.error });
-    }
-  });
+    });
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
 }
 
+// SignIn
 async function LoginController(req, res) {
   const { email, password } = req.body;
   try {
@@ -102,6 +101,7 @@ async function LoginController(req, res) {
     return res.status(400).send({ message: error });
   }
 }
+// Otp verify
 async function otpVerifyController(req, res) {
   const { email, otp } = req.body;
   const existinguser = await userModel.findOne({ email });
@@ -117,17 +117,17 @@ async function otpVerifyController(req, res) {
     return res.status(404).send({ message: "user not found" });
   }
 }
-
+// Resent otp
 async function resendOtpController(req, res) {
   const { email } = req.body;
   const exitinguser = await userModel.findOne({ email });
   if (exitinguser) {
     exitinguser.otp = otp;
     await exitinguser.save();
-    Sendemail(email );
-    setTimeout(async() => {
+    Sendemail(email);
+    setTimeout(async () => {
       exitinguser.otp = null;
-      await exitinguser.save()
+      await exitinguser.save();
     }, 120000);
     res
       .status(200)
