@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   CreatecategoryController,
+  deletecategoryController,
 } = require("../../Controllers/categoryController");
 const multer = require("multer");
 const router = express.Router();
@@ -10,7 +11,7 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const uniquefilename = Date.now() + "-" + Math.round(Math.random() * 1e9);
-  
+
     const extention = file.originalname.split(".");
 
     cb(
@@ -42,5 +43,6 @@ router.post(
   errorCheck,
   CreatecategoryController
 );
+router.delete("/deletecategory/:id", deletecategoryController);
 
 module.exports = router;

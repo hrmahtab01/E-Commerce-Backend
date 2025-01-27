@@ -23,13 +23,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 const multerErrorCheck = (error, req, res, next) => {
-   if (error) {
-    return res.status(500).send({success:false , message:error.message});
-  
-    
-   }
+  if (error) {
+    return res.status(500).send({ success: false, message: error.message });
+  }
 };
 
-router.post("/createproduct", upload.array("image"),multerErrorCheck, createproductController);
+router.post(
+  "/createproduct",
+  upload.array("image"),
+  multerErrorCheck,
+  createproductController
+);
 
 module.exports = router;

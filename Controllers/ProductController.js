@@ -1,4 +1,5 @@
 const productModel = require("../Model/productModel");
+const categoryModel = require("../Model/categoryModel");
 
 async function createproductController(req, res) {
   const { name, description, sellingprice, discountprice, category } = req.body;
@@ -9,13 +10,15 @@ async function createproductController(req, res) {
 //   if (!name || !description || !sellingprice || !discountprice || !category) {
 //     return res.status(400).send({ error: "All fields are required" });
 //   }
+
+  const categoryid = categoryExist._id;
   try {
     const product = await productModel.create({
       name,
       description,
       sellingprice,
       discountprice,
-      category,
+      category:categoryid,
       image:process.env.host_url+image
     });
     return res
