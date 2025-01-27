@@ -1,41 +1,70 @@
 const productModel = require("../Model/productModel");
-const categoryModel = require("../Model/categoryModel");
+const fs = require("fs");
+const path = require("path");
 
 async function createproductController(req, res) {
   const { name, description, sellingprice, discountprice, category } = req.body;
 
- 
-  const image = req.files.map((img)=>img.filename)
+  const image = req.files.map((img) => img.filename);
 
-//   if (!name || !description || !sellingprice || !discountprice || !category) {
-//     return res.status(400).send({ error: "All fields are required" });
-//   }
+  //   if (!name || !description || !sellingprice || !discountprice || !category) {
+  //     return res.status(400).send({ error: "All fields are required" });
+  //   }
 
-  const categoryid = categoryExist._id;
+  // const categoryid = categoryExist._id;
   try {
     const product = await productModel.create({
       name,
       description,
       sellingprice,
       discountprice,
-      category:categoryid,
-      image:process.env.host_url+image
+      image: process.env.host_url + image,
     });
-    return res
-      .status(201)
-      .send({
-        success: true,
-        message: "product created successfully",
-        data: product,
-      });
+    return res.status(201).send({
+      success: true,
+      message: "product created successfully",
+      data: product,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .send({
-        success: false,
-        message: error.message || "something went wrong",
-      });
+    res.status(500).send({
+      success: false,
+      message: error.message || "something went wrong",
+    });
   }
 }
 
-module.exports = { createproductController };
+async function deleteproductController(req, res) {
+  const { id } = req.params;
+
+  try {
+    const exitproduct = await productModel.findOne({ _id: id });
+    if (!exitproduct) {
+      return res
+        .status(404)
+        .send({ success: false, message: "product not found" });
+    }
+
+    const productimage = exitproduct.image[0];
+    const filename = productimage.split("/");
+    const finalfile = filename[filename.length - 1];
+    const mainfile = finalfile.split(",");
+
+    fs.unlink(path.join(__dirname, `${"../uploads"}/${mainfile}`), (error) => {
+      if (error) {
+        return res.status(500).send({ success: false, message: error.message });
+      }
+      res.status(200).send({
+        success: true,
+        message: "product deleted successfully",
+        data: exitproduct,
+      });
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: error.message || "something went wrong",
+    });
+  }
+}
+
+module.exports = { createproductController, deleteproductController };
