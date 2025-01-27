@@ -20,12 +20,12 @@ const productSchema = mongoose.Schema({
   discoutdprice: {
     type: Number,
   },
-  category:[
+  category:
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
-    }
-  ],
+    },
+  
   review: [
     {
       type: mongoose.Schema.Types.ObjectId,

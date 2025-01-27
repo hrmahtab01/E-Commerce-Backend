@@ -1,6 +1,7 @@
 const productModel = require("../Model/productModel");
 const fs = require("fs");
 const path = require("path");
+const categoryModel = require("../Model/categoryModel");
 
 async function createproductController(req, res) {
   const { name, description, sellingprice, discountprice, category } = req.body;
@@ -18,8 +19,16 @@ async function createproductController(req, res) {
       description,
       sellingprice,
       discountprice,
+      category,
       image: process.env.host_url + image,
     });
+    await categoryModel.findOneAndUpdate(
+      { _id: category },
+      {
+        $push: { product: product._id },
+      },
+      { new: true }
+    );
     return res.status(201).send({
       success: true,
       message: "product created successfully",
