@@ -11,7 +11,7 @@ const StoreSchema = mongoose.Schema(
     description: {
       type: String,
     },
-    Image: {
+    image: {
       required: true,
       type: String,
     },
