@@ -2,9 +2,11 @@ const productModel = require("../Model/productModel");
 const fs = require("fs");
 const path = require("path");
 const categoryModel = require("../Model/categoryModel");
+const StoreModel = require("../Model/storeModel");
 
 async function createproductController(req, res) {
-  const { name, description, sellingprice, discountprice, category } = req.body;
+  const { name, description, sellingprice, discountprice, category, store } =
+    req.body;
 
   const image = req.files.map((img) => img.filename);
 
@@ -27,6 +29,14 @@ async function createproductController(req, res) {
       {
         $push: { product: product._id },
       },
+      { new: true }
+    );
+
+    await StoreModel.findOneAndUpdate(
+      {
+        _id: store,
+      },
+      { $push: { products: product._id } },
       { new: true }
     );
     return res.status(201).send({
