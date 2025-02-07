@@ -2,6 +2,8 @@ const express = require("express");
 const {
   CreatecategoryController,
   deletecategoryController,
+  allcategoryController,
+  getsinglecategoryController,
 } = require("../../Controllers/categoryController");
 const multer = require("multer");
 const router = express.Router();
@@ -44,5 +46,7 @@ router.post(
   CreatecategoryController
 );
 router.delete("/deletecategory/:id", deletecategoryController);
+router.get("/allcategory", allcategoryController);
+router.get("/singlecategory/:id", getsinglecategoryController);
 
 module.exports = router;

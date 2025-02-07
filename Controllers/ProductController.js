@@ -31,7 +31,7 @@ async function createproductController(req, res) {
       },
       { new: true }
     );
-
+  
     await StoreModel.findOneAndUpdate(
       {
         _id: store,

@@ -2,15 +2,22 @@ const { error } = require("console");
 const categoryModel = require("../Model/categoryModel");
 const fs = require("fs");
 const path = require("path");
+const { default: mongoose } = require("mongoose");
 
 async function CreatecategoryController(req, res) {
   const { name, description } = req.body;
-  const { filename } = req.file;
+
   if (!name) {
-    return res.status(400).send({ error: "name is required" });
+    return res.status(400).send({ success: false, error: "name is required" });
   }
-  if (!filename) {
-    return res.status(400).send({ error: "iamge is required" });
+
+  if (!req.file || !req.file.filename) {
+    return res.status(400).json({ success: false, error: "Image is required" });
+  }
+  const { filename } = req.file;
+  const existcategory = await categoryModel.findOne({ name });
+  if (existcategory) {
+    return res.status(409).send({ error: "category already exist" });
   }
 
   const category = await categoryModel.create({
@@ -53,5 +60,46 @@ async function deletecategoryController(req, res) {
     });
   }
 }
+async function allcategoryController(req, res) {
+  try {
+    const allcategory = await categoryModel.find({});
+    return res.status(200).send({
+      success: true,
+      message: "get all category successfully",
+      data: allcategory,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: error.message || "something went wrong",
+    });
+  }
+}
+async function getsinglecategoryController(req, res) {
+  const { id } = req.params;
+  try {
+    const singlecategory = await categoryModel.findOne({ _id: id });
+    if (!singlecategory) {
+      return res
+        .status(404)
+        .send({ success: false, message: "category not found" });
+    }
+    return res.status(200).send({
+      success: true,
+      message: "get single category successfully",
+      data: singlecategory,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: error.message || "something went wrong ",
+    });
+  }
+}
 
-module.exports = { CreatecategoryController, deletecategoryController };
+module.exports = {
+  CreatecategoryController,
+  deletecategoryController,
+  allcategoryController,
+  getsinglecategoryController,
+};
