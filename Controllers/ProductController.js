@@ -31,7 +31,7 @@ async function createproductController(req, res) {
       },
       { new: true }
     );
-  
+
     await StoreModel.findOneAndUpdate(
       {
         _id: store,
@@ -86,4 +86,26 @@ async function deleteproductController(req, res) {
   }
 }
 
-module.exports = { createproductController, deleteproductController };
+async function getallProductController(req, res) {
+  try {
+    const allproduct = await productModel.find({});
+    return res.status(200).send({
+      success: true,
+      message: "get all product successfully",
+      data: allproduct,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .send({
+        success: false,
+        message: error.message || "something went wrong",
+      });
+  }
+}
+
+module.exports = {
+  createproductController,
+  deleteproductController,
+  getallProductController,
+};

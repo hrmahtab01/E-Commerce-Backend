@@ -119,16 +119,13 @@ async function updatecategoryController(req, res) {
       path.join(__dirname, `${"../uploads"}/${deletefile}`),
       (error) => {
         if (error) {
-          return res
-            .status(500)
-            .send({
-              success: false,
-              message: error.message || "something went wrong",
-            });
+          return res.status(500).send({
+            success: false,
+            message: error.message || "something went wrong",
+          });
         }
       }
     );
-    console.log(filename);
 
     const category = await categoryModel.findOneAndUpdate(
       {
