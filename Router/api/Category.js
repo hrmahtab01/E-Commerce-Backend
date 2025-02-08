@@ -4,8 +4,10 @@ const {
   deletecategoryController,
   allcategoryController,
   getsinglecategoryController,
+  updatecategoryController
 } = require("../../Controllers/categoryController");
 const multer = require("multer");
+const { route } = require("./Auth");
 const router = express.Router();
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -48,5 +50,6 @@ router.post(
 router.delete("/deletecategory/:id", deletecategoryController);
 router.get("/allcategory", allcategoryController);
 router.get("/singlecategory/:id", getsinglecategoryController);
+router.patch("/updatecategory/:id", upload.single("image"), errorCheck , updatecategoryController);
 
 module.exports = router;

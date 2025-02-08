@@ -97,9 +97,67 @@ async function getsinglecategoryController(req, res) {
   }
 }
 
+async function updatecategoryController(req, res) {
+  const { id } = req.params;
+  const { name, description } = req.body;
+
+  if (!req.file || !req.file.filename) {
+    return res.status(400).send({ success: false, error: "image is required" });
+  }
+  const { filename } = req.file;
+
+  try {
+    const exitcategory = await categoryModel.findOne({ _id: id });
+    if (!exitcategory) {
+      return res
+        .status(404)
+        .send({ success: false, message: "category not found" });
+    }
+    const cateimage = exitcategory.image.split("/");
+    const deletefile = cateimage[cateimage.length - 1];
+    fs.unlink(
+      path.join(__dirname, `${"../uploads"}/${deletefile}`),
+      (error) => {
+        if (error) {
+          return res
+            .status(500)
+            .send({
+              success: false,
+              message: error.message || "something went wrong",
+            });
+        }
+      }
+    );
+    console.log(filename);
+
+    const category = await categoryModel.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      {
+        name,
+        description,
+        image: process.env.host_url + filename,
+      },
+      { new: true }
+    );
+    return res.status(200).send({
+      success: true,
+      message: "category created successfully",
+      data: category,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: error.message || "something went wrong",
+    });
+  }
+}
+
 module.exports = {
   CreatecategoryController,
   deletecategoryController,
   allcategoryController,
   getsinglecategoryController,
+  updatecategoryController,
 };
