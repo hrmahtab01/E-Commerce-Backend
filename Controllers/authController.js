@@ -31,7 +31,11 @@ async function registetionController(req, res) {
       let user = new userModel({ name, email, password: hash });
       await user.save();
       Sendemail(email);
-      await userModel.findOneAndUpdate({ email }, { otp: otpvalue }, { new: true });
+      await userModel.findOneAndUpdate(
+        { email },
+        { otp: otpvalue },
+        { new: true }
+      );
       setTimeout(async () => {
         await userModel.findOneAndUpdate(
           { email },
@@ -72,7 +76,7 @@ async function LoginController(req, res) {
             });
           } else if (exituser.role === "admin") {
             token = jwt.sign({ tokeninfo }, process.env.prv_key, {
-              expiresIn: "1h",
+              expiresIn: "5 minutes",
             });
             res.cookie("token", token, {
               httponly: true,
@@ -135,4 +139,3 @@ module.exports = {
   otpVerifyController,
   resendOtpController,
 };
-
