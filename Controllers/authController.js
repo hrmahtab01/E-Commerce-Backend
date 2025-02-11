@@ -5,7 +5,6 @@ const bcrypt = require("bcrypt");
 const Sendemail = require("../helpers/SendEmalil");
 jwt = require("jsonwebtoken");
 const otp = require("../helpers/Otpgenerator");
-const { verify } = require("jsonwebtoken");
 
 // Signup
 async function registetionController(req, res) {
