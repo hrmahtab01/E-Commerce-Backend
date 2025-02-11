@@ -10,9 +10,15 @@ async function createproductController(req, res) {
 
   const image = req.files.map((img) => img.filename);
 
-  //   if (!name || !description || !sellingprice || !discountprice || !category) {
-  //     return res.status(400).send({ error: "All fields are required" });
-  //   }
+  
+
+    if (!name || !description || !sellingprice || !discountprice || !category) {
+      return res.status(400).send({ error: "All fields are required" });
+    }
+    if (!image) {
+      return res.status(400).send({ error: "Image is required" });
+      
+    }
 
   // const categoryid = categoryExist._id;
   try {

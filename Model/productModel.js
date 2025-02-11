@@ -17,7 +17,7 @@ const productSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-  discoutdprice: {
+  discoutprice: {
     type: Number,
   },
   category:
