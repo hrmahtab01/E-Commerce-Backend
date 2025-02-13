@@ -4,7 +4,7 @@ const {
   deletecategoryController,
   allcategoryController,
   getsinglecategoryController,
-  updatecategoryController
+  updatecategoryController,
 } = require("../../Controllers/categoryController");
 const multer = require("multer");
 const { route } = require("./Auth");
@@ -44,14 +44,24 @@ function errorCheck(error, req, res, next) {
 
 router.post(
   "/createcategory",
+  getusermiddleware,
   upload.single("image"),
   errorCheck,
-  getusermiddleware,
   CreatecategoryController
 );
-router.delete("/deletecategory/:id", getusermiddleware, deletecategoryController);
+router.delete(
+  "/deletecategory/:id",
+  getusermiddleware,
+  deletecategoryController
+);
 router.get("/allcategory", allcategoryController);
 router.get("/singlecategory/:id", getsinglecategoryController);
-router.patch("/updatecategory/:id", getusermiddleware, upload.single("image"), errorCheck , updatecategoryController);
+router.patch(
+  "/updatecategory/:id",
+  getusermiddleware,
+  upload.single("image"),
+  errorCheck,
+  updatecategoryController
+);
 
 module.exports = router;
